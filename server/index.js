@@ -20,7 +20,14 @@ app.use('/api/inspirations', require('./routes/inspirations'));
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fashion-tailor';
 
-mongoose.connect(MONGODB_URI, {
+// Ensure database name is included in connection string
+let connectionString = MONGODB_URI;
+if (connectionString.includes('mongodb+srv://') && !connectionString.includes('/fashion-tailor')) {
+  // Add database name if not present
+  connectionString = connectionString.replace('?', '/fashion-tailor?');
+}
+
+mongoose.connect(connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
