@@ -82,6 +82,19 @@ const Outfits = () => {
     }));
   };
 
+  // Sort items by category order: jacket, shirt, pants, shoes, then others
+  const sortItemsByCategory = (items) => {
+    const categoryOrder = ['jacket', 'shirt', 'pants', 'shoes', 'dress', 'accessories', 'other'];
+    return [...items].sort((a, b) => {
+      const aIndex = categoryOrder.indexOf(a.category);
+      const bIndex = categoryOrder.indexOf(b.category);
+      // If category not found, put it at the end
+      const aPos = aIndex === -1 ? categoryOrder.length : aIndex;
+      const bPos = bIndex === -1 ? categoryOrder.length : bIndex;
+      return aPos - bPos;
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -117,31 +130,59 @@ const Outfits = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {outfits.map((outfit) => (
-              <div key={outfit._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
-                <h3 className="text-xl font-bold mb-2">{outfit.name}</h3>
-                {outfit.style && (
-                  <p className="text-gray-600 text-sm mb-4">Style: {outfit.style}</p>
-                )}
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  {outfit.itemIds && outfit.itemIds.length > 0 ? (
-                    outfit.itemIds.map((item) => (
-                      <div key={item._id} className="bg-gray-100 p-2 rounded text-center text-sm">
-                        {item.name || item.category}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm">No items</p>
+            {outfits.map((outfit) => {
+              const sortedItems = outfit.itemIds && outfit.itemIds.length > 0 
+                ? sortItemsByCategory(outfit.itemIds) 
+                : [];
+              
+              return (
+                <div key={outfit._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
+                  <h3 className="text-xl font-bold mb-2">{outfit.name}</h3>
+                  {outfit.style && (
+                    <p className="text-gray-600 text-sm mb-4">Style: {outfit.style}</p>
                   )}
+                  {sortedItems.length > 0 ? (
+                    <div className="flex flex-col gap-2 mb-4">
+                      {sortedItems.map((item) => (
+                        <div key={item._id} className="relative">
+                          <div className="h-32 bg-gray-200 rounded-lg overflow-hidden">
+                            {item.imageUrl ? (
+                              <img 
+                                src={item.imageUrl} 
+                                alt={item.name || item.category} 
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center">
+                                <span className="text-gray-400 text-2xl">
+                                  {item.category === 'jacket' && '🧥'}
+                                  {item.category === 'shirt' && '👔'}
+                                  {item.category === 'pants' && '👖'}
+                                  {item.category === 'shoes' && '👟'}
+                                  {!['jacket', 'shirt', 'pants', 'shoes'].includes(item.category) && '👕'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2 rounded-b-lg">
+                            <p className="font-semibold">{item.name || item.category}</p>
+                            <p className="text-xs capitalize">{item.category}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm mb-4">No items</p>
+                  )}
+                  <button
+                    onClick={() => handleDelete(outfit._id)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleDelete(outfit._id)}
-                  className="text-red-600 hover:text-red-800 text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
