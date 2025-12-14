@@ -30,9 +30,10 @@ router.get('/:id', auth, async (req, res) => {
 // Add wardrobe item
 router.post('/', auth, async (req, res) => {
   try {
-    const { category, color, brand, imageUrl, metadata } = req.body;
+    const { name, category, color, brand, imageUrl, metadata } = req.body;
     const item = new WardrobeItem({
       userId: req.user._id,
+      name,
       category,
       color,
       brand: brand || '',

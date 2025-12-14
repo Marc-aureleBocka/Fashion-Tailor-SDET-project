@@ -6,6 +6,7 @@ const Wardrobe = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     category: 'shirt',
     color: '',
     brand: '',
@@ -32,7 +33,7 @@ const Wardrobe = () => {
     try {
       await api.post('/wardrobe', formData);
       setShowModal(false);
-      setFormData({ category: 'shirt', color: '', brand: '', imageUrl: '' });
+      setFormData({ name: '', category: 'shirt', color: '', brand: '', imageUrl: '' });
       fetchItems();
     } catch (error) {
       console.error('Error adding item:', error);
@@ -91,7 +92,8 @@ const Wardrobe = () => {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg capitalize">{item.category}</h3>
+                  <h3 className="font-semibold text-lg">{item.name || item.category.charAt(0).toUpperCase() + item.category.slice(1)}</h3>
+                  <p className="text-gray-500 text-sm capitalize">{item.category}</p>
                   <p className="text-gray-600 text-sm">Color: {item.color}</p>
                   {item.brand && <p className="text-gray-600 text-sm">Brand: {item.brand}</p>}
                   <button
@@ -112,6 +114,19 @@ const Wardrobe = () => {
               <h2 className="text-2xl font-bold mb-4">Add Wardrobe Item</h2>
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Item Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500"
+                      required
+                      placeholder="e.g., Blue Denim Jacket, White Sneakers"
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Category

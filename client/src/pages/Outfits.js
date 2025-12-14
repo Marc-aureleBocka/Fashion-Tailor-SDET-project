@@ -127,7 +127,7 @@ const Outfits = () => {
                   {outfit.itemIds && outfit.itemIds.length > 0 ? (
                     outfit.itemIds.map((item) => (
                       <div key={item._id} className="bg-gray-100 p-2 rounded text-center text-sm">
-                        {item.category}
+                        {item.name || item.category}
                       </div>
                     ))
                   ) : (
@@ -195,8 +195,8 @@ const Outfits = () => {
                             onChange={() => toggleItemSelection(item._id)}
                             className="rounded"
                           />
-                          <span className="text-sm capitalize">
-                            {item.category} - {item.color}
+                          <span className="text-sm">
+                            {item.name || `${item.category} - ${item.color}`}
                           </span>
                         </label>
                       ))}
