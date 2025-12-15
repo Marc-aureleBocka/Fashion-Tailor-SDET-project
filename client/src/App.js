@@ -15,7 +15,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+    <div className="App">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -55,7 +55,7 @@ function App() {
             />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
-        </div>
+    </div>
       </Router>
     </AuthProvider>
   );
