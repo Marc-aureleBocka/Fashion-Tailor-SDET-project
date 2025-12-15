@@ -52,7 +52,7 @@ const Outfits = () => {
 
   const handleGenerate = async () => {
     try {
-      const response = await api.post('/outfits/generate', { style: 'casual' });
+      await api.post('/outfits/generate', { style: 'casual' });
       fetchOutfits();
       alert('Outfit generated successfully!');
     } catch (error) {
