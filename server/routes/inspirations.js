@@ -34,41 +34,17 @@ router.get('/:id', auth, async (req, res) => {
 // Import inspiration (image URL or link)
 router.post('/', auth, async (req, res) => {
   try {
-    const { imageUrl, extractedItems, matchedRecommendations } = req.body;
-    
-    // In a real implementation, you would:
-    // 1. Process the image URL to extract clothing items
-    // 2. Use AI/ML to identify categories, colors, styles
-    // 3. Find similar items from fashion APIs or databases
-    // For now, we'll store the basic data
-    
+    const { imageUrl, name, genre, extractedItems } = req.body;
+
     const inspiration = new ImportedInspiration({
       userId: req.user._id,
       imageUrl,
+      name,
+      genre,
       extractedItems: extractedItems || [],
-      matchedRecommendations: matchedRecommendations || [],
     });
     await inspiration.save();
-    
-    // Simulate recommendation matching (in production, use actual AI/ML service)
-    const recommendations = [
-      {
-        item: 'Similar Shirt',
-        price: '$49.99',
-        link: 'https://example.com/similar-shirt',
-        similarity: 0.85,
-      },
-      {
-        item: 'Matching Pants',
-        price: '$79.99',
-        link: 'https://example.com/matching-pants',
-        similarity: 0.82,
-      },
-    ];
-    
-    inspiration.matchedRecommendations = recommendations;
-    await inspiration.save();
-    
+
     res.status(201).json(inspiration);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

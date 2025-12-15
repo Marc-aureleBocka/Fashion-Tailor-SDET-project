@@ -6,8 +6,6 @@ const Inspirations = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [name, setName] = useState('');
-  const [genre, setGenre] = useState('streetwear');
 
   useEffect(() => {
     fetchInspirations();
@@ -27,13 +25,11 @@ const Inspirations = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/inspirations', { imageUrl, name, genre });
+      await api.post('/inspirations', { imageUrl });
       setShowModal(false);
       setImageUrl('');
-      setName('');
-      setGenre('streetwear');
       fetchInspirations();
-      alert('Inspiration saved!');
+      alert('Inspiration imported! Similar items are being matched...');
     } catch (error) {
       console.error('Error importing inspiration:', error);
       alert('Error importing inspiration. Please try again.');
@@ -76,21 +72,18 @@ const Inspirations = () => {
         {inspirations.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow">
             <p className="text-gray-500 text-lg">
-              No inspirations yet. Save an outfit inspiration with a name and genre.
+              No inspirations yet. Import an outfit image to find similar pieces!
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {inspirations.map((inspiration) => (
-              <div
-                key={inspiration._id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
-              >
+              <div key={inspiration._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
                 <div className="h-64 bg-gray-200 flex items-center justify-center">
                   {inspiration.imageUrl ? (
                     <img
                       src={inspiration.imageUrl}
-                      alt={inspiration.name || 'Inspiration'}
+                      alt="Inspiration"
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -98,13 +91,27 @@ const Inspirations = () => {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-1">
-                    {inspiration.name || 'Outfit Inspiration'}
-                  </h3>
-                  {inspiration.genre && (
-                    <p className="text-sm text-gray-600 mb-2 capitalize">
-                      Genre: {inspiration.genre}
-                    </p>
+                  <h3 className="font-semibold text-lg mb-2">Outfit Inspiration</h3>
+                  {inspiration.matchedRecommendations && inspiration.matchedRecommendations.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Similar Items:</p>
+                      <div className="space-y-2">
+                        {inspiration.matchedRecommendations.slice(0, 2).map((rec, idx) => (
+                          <div key={idx} className="bg-gray-50 p-2 rounded text-sm">
+                            <p className="font-medium">{rec.item}</p>
+                            <p className="text-gray-600">{rec.price}</p>
+                            <a
+                              href={rec.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary-600 hover:text-primary-800 text-xs"
+                            >
+                              View Item →
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                   <button
                     onClick={() => handleDelete(inspiration._id)}
@@ -126,39 +133,6 @@ const Inspirations = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Outfit Name
-                    </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500"
-                      required
-                      placeholder="e.g., Summer Streetwear Fit"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Genre / Style
-                    </label>
-                    <select
-                      value={genre}
-                      onChange={(e) => setGenre(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500"
-                      required
-                    >
-                      <option value="streetwear">Streetwear</option>
-                      <option value="business casual">Business Casual</option>
-                      <option value="minimalist">Minimalist</option>
-                      <option value="bohemian">Bohemian</option>
-                      <option value="classic">Classic</option>
-                      <option value="sporty">Sporty</option>
-                      <option value="elegant">Elegant</option>
-                      <option value="casual">Casual</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Image URL or Link
                     </label>
                     <input
@@ -170,7 +144,7 @@ const Inspirations = () => {
                       placeholder="https://example.com/outfit-image.jpg"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Paste a link to an outfit image that matches your chosen genre.
+                      Paste a link to an outfit image. We'll find similar pieces for you.
                     </p>
                   </div>
                 </div>
