@@ -27,12 +27,25 @@ if (connectionString.includes('mongodb+srv://') && !connectionString.includes('/
   connectionString = connectionString.replace('?', '/fashion-tailor?');
 }
 
-mongoose.connect(connectionString, {
+// MongoDB connection options optimized for serverless
+const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+  // Optimize for serverless environments
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+};
+
+// Connect to MongoDB
+mongoose.connect(connectionString, mongooseOptions)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    // In serverless, don't crash - let the function handle it
+    if (process.env.VERCEL !== '1') {
+      process.exit(1);
+    }
+  });
 
 const PORT = process.env.PORT || 5000;
 
